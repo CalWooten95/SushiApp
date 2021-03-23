@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Menu{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('customer.index') }}">New</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% for item in table %}
+    <article class="Menu">
+      <header>
+        <div>
+          <h1>{{ item['itemName'] }}</h1>
+          <div class="about">Price ${{ item['price'] }} </div>
+        </div>
+      </header>
+      <p class="body">{{ item['description'] }}</p>
+        <a class="Add to order" href="{{ url_for('customer.checkout') }}">Add Item</a>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+{% endfor  %}
+{% endblock %}
