@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request
-server_app = Flask(__name__)
+from flask import (
+    Blueprint, flash, g, redirect, render_template, request, url_for
+)
+from werkzeug.exceptions import abort
 
-@server_app.route('/')
+from flaskr.auth import login_required
+from flaskr.db import get_db
+bp = Blueprint('server', __name__)
+
+@bp.route('/server')
 def server_main_page():
-   return render_template('server/server.html')
-
-if __name__ == '__main__':
-   server_app.run()
+   return render_template('server/serverBase.html')
