@@ -8,6 +8,7 @@ def create_app(test_config = None):
     app.config.from_mapping(
         SECRET_KEY = 'dev',
         DATABASE = os.path.join(app.instance_path, 'flaskr.sqlite'),
+        TEMPLATES_AUTO_RELOAD = True
     )
 
     if test_config is None:
@@ -23,9 +24,7 @@ def create_app(test_config = None):
         pass
 
 
-    @app.route('/hello')
-    def home():
-        return 'Home'
+
 
     #register db
     from . import db
@@ -40,7 +39,13 @@ def create_app(test_config = None):
     app.register_blueprint(customer.bp)
     app.add_url_rule('/', endpoint='index')
 
+
     #register checkout
     app.add_url_rule('/', endpoint='checkout')
+    app.add_url_rule('/', endpoint='addItem')
 
+    #register server
+    from . import server
+    app.register_blueprint(server.bp)
+    app.add_url_rule('/', endpoint='server')
     return app
