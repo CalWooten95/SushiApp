@@ -17,7 +17,7 @@
         </div>
       </header>
       <p class="body">{{ item['description'] }}</p>
-        <a class="Add to order" href="{{ url_for('customer.checkout') }}">Add Item</a>
+        <a class="Add to order" href="{{ url_for('customer.addItem', id=item['iid']) }}">Add Item</a>
     </article>
     {% if not loop.last %}
       <hr>
