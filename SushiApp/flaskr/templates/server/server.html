@@ -1,0 +1,45 @@
+<!doctype html>
+{% block header %}
+<h1 size="10" align="center">Order Manager</h1>
+{% endblock %}
+{% block content %}
+<table cellspacing="10" style="background-color:gray;">
+	<tr>
+		<td><h1 size="8" style="background-color:grey;">{% block title %}List of Orders{% endblock %}</h1><td>
+		<td><button>Add a new Order</button></td>
+	</tr>
+</table>
+
+<table>
+	<tr>
+		<td>
+		<article class="List of Orders">
+			<div>
+				<table>
+					<tr>
+						<td style="border:blue; border-width:6px; border-style:outset;">
+							<font size="5">Order Number: Table Number: Seat Number: <button>Edit Order</button><button>Delete Order</button></font>
+							<p size="3">Order Description: </p>
+						<td>
+						<td style="background-color:orange;border:blue; border-width:6px; border-style:outset;"><h1 size="8">In Progress</h1></td>	
+					</tr>	
+				</table>
+			</div>
+		</article>
+		</td>
+		<td style="border:black; border-width:4px; border-style:outset;">
+			<h1 size="8" style="background-color:yellow">Refill Requests</h1>
+			<article class="Refill Request">
+				<table>
+					<tr>
+						<td>
+							<font size="3" style="border:blue; border-width:1px; border-style:outset;">Table Number: Seat Number: Beverage: </font>
+						</td>
+						<td><button>Request Fulfilled</button></td>
+					</tr>
+				</table>
+			</article>
+		</td>
+	</tr>
+</table>
+{% endblock %}
