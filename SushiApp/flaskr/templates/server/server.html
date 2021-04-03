@@ -6,7 +6,7 @@
 <table cellspacing="10" style="background-color:gray;">
 	<tr>
 		<td><h1 size="8" style="background-color:grey;">{% block title %}List of Orders{% endblock %}</h1><td>
-		<td><button>Add a new Order</button></td>
+		<td><button onclick="window.location.href='/addorder'">Add a new Order</button></td>
 	</tr>
 </table>
 
@@ -16,13 +16,18 @@
 		<article class="List of Orders">
 			<div>
 				<table>
+				{% for o in table %}
 					<tr>
-						<td style="border:blue; border-width:6px; border-style:outset;">
-							<font size="5">Order Number: Table Number: Seat Number: <button>Edit Order</button><button>Delete Order</button></font>
-							<p size="3">Order Description: </p>
+						<td style="border:teal; border-width:6px; border-style:outset;">
+							<font size="3">Order Number: {{ o['ordernum'] }} Table Number: {{ o['tablenum'] }} Seat Number: {{ o['seatnum'] }} <button>Edit Order</button><button class="Delete Order" onclick="window.location.href='/{{ o.id }}/deleteorder'">Delete Order</button></font>
+							<p size="3">Order Description: {{ o['itemName'] }}</p>
 						<td>
-						<td style="background-color:orange;border:blue; border-width:6px; border-style:outset;"><h1 size="8">In Progress</h1></td>	
-					</tr>	
+						<td style="background-color:orange;border:teal; border-width:6px; border-style:outset;"><h1 size="8">In Progress</h1></td>	
+					</tr>
+					{% if not loop.last %}
+						<hr>
+					{% endif %}
+				{% endfor %}
 				</table>
 			</div>
 		</article>
@@ -31,14 +36,35 @@
 			<h1 size="8" style="background-color:yellow">Refill Requests</h1>
 			<article class="Refill Request">
 				<table>
+				{% for r in table2 %}
 					<tr>
 						<td>
-							<font size="3" style="border:blue; border-width:1px; border-style:outset;">Table Number: Seat Number: Beverage: </font>
+							<font size="2" style="border:blue; border-width:1px; border-style:outset;"> Table Number: {{ r['tablenumber'] }} Seat Number: {{ r['seatnumber'] }} Beverage: {{ r['beverage'] }} </font>
 						</td>
-						<td><button>Request Fulfilled</button></td>
+						<td><button onclick="window.location.href='/{{ r.iid }}/requestfulfilled'">Request Fulfilled</button></td>
 					</tr>
+					{% if not loop.last %}
+						<hr>
+					{% endif %}
+				{% endfor %}
 				</table>
 			</article>
+		</td>
+		<td>
+			<h1>Help Needed</h1>
+			<table>
+				{% for h in table3 %}
+				<tr>
+					<td>
+						<font size="2" style="border:blue; border-width:1px; border-style:outset;"> Tablenumber: {{ h['tablenumber'] }}</font>
+						<button onclick="window.location.href='/{{ h.id }}/helpcomplete'">Complete</button>
+					</td>
+				<tr>
+					{% if not loop.last %}
+						<hr>
+					{% endif %}
+				{% endfor %}
+			<table>
 		</td>
 	</tr>
 </table>

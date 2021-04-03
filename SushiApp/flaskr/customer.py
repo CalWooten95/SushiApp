@@ -15,13 +15,13 @@ def get_item(id):
 
 
     )
-
+# FOREIGN KEY (custID) REFERENCES user(id)
 
 @bp.route('/')
 def index():
     db = get_db()
     table = db.execute('SELECT * FROM items').fetchall()
-
+    
 
     return render_template('customer/index.html', table=table)
 

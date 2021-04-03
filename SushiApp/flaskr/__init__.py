@@ -48,4 +48,8 @@ def create_app(test_config = None):
     from . import server
     app.register_blueprint(server.bp)
     app.add_url_rule('/', endpoint='server')
+    app.add_url_rule('/', endpoint='deleteorder' )
+    app.add_url_rule('/', endpoint='addorder')
+    app.add_url_rule('/', endpoint='requestfulfilled')
+    app.add_url_rule('/', endpoint='helpcomplete')
     return app
