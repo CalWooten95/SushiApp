@@ -1,3 +1,4 @@
+import time
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
@@ -26,28 +27,30 @@ def index():
 
 
 
-@bp.route('/checkout/')
+@bp.route('/checkout/', methods=('GET','POST'))
 @login_required
 def checkout():
     db = get_db()
-
     user_id = session.get('user_id')
     table = db.execute(
                     'SELECT i.iid, i.price, i.itemName '
                     'From items i '
                     'JOIN orderedItems oi ON i.iid = oi.iid '
-                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1', (user_id,)
+                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
                  ).fetchall()
+    if len(table) == 0:
+        hasItems = False
+    else:
+        hasItems = True
 
-
-    return render_template('customer/checkout.html', order=table)
+    return render_template('customer/checkout.html', order=table, hasItems=hasItems)
 
 @bp.route('/<int:id>/addItem/', methods=('GET','POST'))
 @login_required
 def addItem(id):
     db = get_db()
     user_id = session.get('user_id')
-    db.execute('INSERT INTO orderedItems (iid, uid, active) VALUES (?, ?, 1)', (id, user_id))
+    db.execute('INSERT INTO orderedItems (iid, uid, active, completed, timePlaced) VALUES (?, ?, 1, NULL, 0)', (id, user_id,))
     db.commit()
     flashItem = db.execute(
                     'SELECT itemName FROM items WHERE iid= ?', (id,)).fetchone()
@@ -57,12 +60,17 @@ def addItem(id):
                     'SELECT i.iid, i.price, i.itemName '
                     'From items i '
                     'JOIN orderedItems oi ON i.iid = oi.iid '
-                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1', (user_id,)
+                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
                  ).fetchall()
 
     flash(flashString)
 
-    return render_template('customer/checkout.html', order=table)
+    if len(table) == 0:
+        hasItems = False
+    else:
+        hasItems = True
+
+    return render_template('customer/checkout.html', order=table, hasItems=hasItems)
 
 
 @bp.route('/<int:id>/remove', methods=('GET','POST'))
@@ -73,7 +81,7 @@ def remove(id):
     flashItem = db.execute(
                     'SELECT i.iid, i.itemName '
                     'From items i '
-                    'JOIN orderedItems oi ON i.iid = oi.iid  WHERE oi.iid= ? AND oi.uid= ? AND oi.active= 1', (id, user_id, )).fetchone()
+                    'JOIN orderedItems oi ON i.iid = oi.iid  WHERE oi.iid= ? AND oi.uid= ? AND oi.active= 1 AND oi.completed IS NULL', (id, user_id, )).fetchone()
 
     flashString = flashItem['itemName'] + " Removed from Order"
     removeItem = db.execute(
@@ -85,7 +93,7 @@ def remove(id):
                     'SELECT i.iid, i.price, i.itemName '
                     'From items i '
                     'JOIN orderedItems oi ON i.iid = oi.iid '
-                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1', (user_id,)
+                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
                  ).fetchall()
 
     flash(flashString)
@@ -96,23 +104,90 @@ def remove(id):
 @login_required
 def complete():
     db = get_db()
-
+    if request.method == 'POST':
+        tip = request.form['tip']
+        return redirect(url_for('customer.pay', tip=tip))
     user_id = session.get('user_id')
     table = db.execute(
                     'SELECT i.iid, i.price, i.itemName '
                     'From items i '
                     'JOIN orderedItems oi ON i.iid = oi.iid '
-                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1', (user_id,)
+                    'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
                  ).fetchall()
     total = 0
     for i in table:
         total += i['price']
 
-    tax = round(total*0.0625, 2)
+    tax = round(total * 0.0625, 2)
     total += tax
 
 
 
     return render_template('customer/complete.html', order=table, tax=tax, total=total)
 
-#@bp.route('/pay/', methods=['GET,POST'])
+@bp.route('/pay/<float:tip>', methods=['GET','POST'])
+@login_required
+def pay(tip):
+    if request.method == 'POST':
+        if luhn(request.form['ccnum']):
+            return redirect(url_for('customer.finish', tip=tip))
+        else:
+            flash("Card Error: Try Again")
+    db = get_db()
+    user_id = session.get('user_id')
+    table = db.execute(
+        'SELECT i.iid, i.price, i.itemName '
+        'From items i '
+        'JOIN orderedItems oi ON i.iid = oi.iid '
+        'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
+    ).fetchall()
+
+    total = 0
+    for i in table:
+        total += i['price']
+
+    tax = round(total * 0.0625, 2)
+    total += tax
+    total += tip
+
+    return render_template('customer/pay.html', order=table, total=total, tax=tax, tip=tip)
+
+@bp.route('/finish/<int:tip>')
+@login_required
+def finish(tip):
+    db = get_db()
+    user_id = session.get('user_id')
+    flash("Card Accepted. Thank you for your order!")
+    table = db.execute(
+        'SELECT oi.ROWID, i.iid, i.price, i.itemName '
+        'From items i '
+        'JOIN orderedItems oi ON i.iid = oi.iid '
+        'JOIN user u ON oi.uid = u.id WHERE u.id = ? AND oi.active = 1 AND oi.completed IS NULL', (user_id,)
+    ).fetchall()
+    total = 0
+    for i in table:
+        total += i['price']
+
+    tax = round(total * 0.0625, 2)
+    total += tax
+    total += tip
+
+    if time.localtime().tm_hour > 12:
+        hour = time.localtime().tm_hour % 12
+        ampm = "P.M."
+    elif time.localtime().tm_hour < 12:
+        ampm = "A.M."
+        hour = time.localtime().tm_hour
+    elif time.localtime().tm_hour == 12:
+        ampm = "P.M."
+        hour = time.localtime().tm_hour
+
+    min = time.localtime().tm_min
+
+
+    #active = 1, completed = 0 for kitchen
+    for item in table:
+        db.execute(
+          'UPDATE orderedItems SET completed = 0 WHERE uid=? AND ROWID=?', (user_id, item['ROWID']))
+        db.commit()
+    return render_template("customer/finish.html", total=total, tip=tip, order=table, hour=hour, min=min, ampm=ampm)

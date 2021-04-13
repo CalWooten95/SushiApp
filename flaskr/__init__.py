@@ -45,6 +45,8 @@ def create_app(test_config = None):
     app.add_url_rule('/', endpoint='addItem')
     app.add_url_rule('/', endpoint='remove')
     app.add_url_rule('/', endpoint='complete')
+    app.add_url_rule('/', endpoint='pay')
+    app.add_url_rule('/', endpoint='finish')
 
     # register server
     from . import server
@@ -54,5 +56,11 @@ def create_app(test_config = None):
     app.add_url_rule('/', endpoint='addorder')
     app.add_url_rule('/', endpoint='requestfulfilled')
     app.add_url_rule('/', endpoint='helpcomplete')
+
+    # register kitchen
+    from . import kitchen
+    app.register_blueprint(kitchen.bp)
+    app.add_url_rule('/', endpoint="kitchen")
+
     return app
 
