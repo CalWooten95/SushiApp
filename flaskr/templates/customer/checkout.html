@@ -4,7 +4,9 @@
   <h1>{% block title %}Checkout{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+    {% if hasItems %}
     <a class="action" href="{{ url_for('customer.complete') }}">Complete Order</a>
+    {% endif %}
   {% endif %}
 {% endblock %}
 
@@ -16,6 +18,7 @@
           <h1>{{ item['itemName'] }}</h1>
           <div class="about">Price ${{ item['price'] }} </div>
         </div>
+          <button type="button" onclick="window.location.href='{{ url_for( 'customer.index' , id=item['iid'] ) }}';">Edit Item</button>
           <button type="button" onclick="window.location.href='{{ url_for( 'customer.remove' , id=item['iid'] ) }}';">Remove Item</button>
       </header>
       <p class="body">{{ order['itemName'] }}</p>

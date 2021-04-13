@@ -4,7 +4,7 @@
   <h1>{% block title %}Menu{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('customer.checkout') }}">Request Refill</a>
-    <a class="action" href="{{ url_for('customer.checkout') }}">Complete Order</a>
+    <a class="action" href="{{ url_for('customer.checkout') }}">View Order</a>
   {% endif %}
 {% endblock %}
 
@@ -15,11 +15,13 @@
         <div>
           <img align="right" src={{ item['link'] }} style="width:150px;height:150px;">
           <h1>{{ item['itemName'] }}</h1>
-          <div class="about">Price ${{ item['price'] }} </div>
+          <div class="about">${{ item['price'] }} </div>
         </div>
       </header>
+      <p class="body"> {{ item['type'] }} </p>
       <p class="body">{{ item['description'] }}</p>
       <button type="button" onclick="window.location.href='{{ url_for( 'customer.addItem' , id=item['iid'] ) }}';">Add Item</button>
+
 
     </article>
     {% if not loop.last %}

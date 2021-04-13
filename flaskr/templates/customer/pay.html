@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Complete Order{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+    <a class="action" href="{{ url_for('customer.checkout') }}">Return to Order</a>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+{% for item in order %}
+        <p>{{ item['itemName'] }} ${{ item['price'] }}</p>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+{% endfor  %}
+
+<h1 align="right">Subtotal: ${{ order | sum(attribute='price')}} </h1>
+<h2 align="right">Tax: ${{ tax }} </h2>
+<h2 align="right">Tip:$ {{ tip }}</h2>
+<h1 align="right">Total: ${{ total }} </h1>
+
+
+<form method="post">
+  <label for="ccnum">Credit Card Numer</label>
+  <input type="text" id="ccnum"  name="ccnum" min="0"  align="right" size="16" style="width: 150px;"required>
+
+<div>
+<form method="post">
+  <label for="month">(MM/YY)</label>
+    <select name="month" id="month" style="width: 50px;float:left;">
+  <option value="01">01</option>
+  <option value="02">02</option>
+  <option value="03">03</option>
+        <option value="04">04</option>
+  <option value="05">05</option>
+  <option value="06">06</option>
+        <option value="07">07</option>
+  <option value="08">08</option>
+  <option value="09">09</option>
+    <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+</select>
+    <label for="year"></label>
+  <input type="number" id="year"  name="year" min="21" max="99"  align="right" size="2" style="width: 50px;float: left;" required>
+
+</div>
+
+
+<form method="post">
+  <label for="cvv">CVV</label>
+  <input type="number" id="cvv"  name="cvv" min="0" max="9999" align="right" maxlength="4" size="4" style="width: 50px" required>
+    <img  src="https://w7.pngwing.com/pngs/117/675/png-transparent-visa-and-mastercard-ads-mastercard-credit-card-american-express-visa-debit-card-mastercard-text-payment-logo.png" style="width:50px;height:25px;">
+    <input type="submit"  value="Submit Payment" size="6">
+</form>
+
+
+
+{% endblock %}
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>

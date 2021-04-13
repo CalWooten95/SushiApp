@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+
+{% block header %}
+  <h1>{% block title %}Receipt{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+  {% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+{% for item in order %}
+        <p>{{ item['itemName'] }} ${{ item['price'] }}</p>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+{% endfor  %}
+
+<h2 align="right">Tip:$ {{ tip }}</h2>
+<h1 align="right">Total: ${{ total }} </h1>
+<h1 align="right">Time Placed: {{ hour }}:{{ min }} {{ampm}}</h1>
+{% endblock %}
