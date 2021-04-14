@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS items;
-DROP TABLE IF EXISTS refills;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,22 +14,35 @@ CREATE TABLE items (
   price FLOAT NOT NULL,
   itemName TEXT NOT NULL,
   description TEXT NOT NULL,
-  type TEXT NOT NULL
+  type TEXT NOT NULL,
+  link TEXT
 
 );
 
 CREATE TABLE orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  seatnum INTEGER NOT NULL,
-  ordernum INTEGER NOT NULL,
-  tablenum INTEGER NOT NULL,
   custID INTEGER NOT NULL,
   total FLOAT NOT NULL,
-  itemName TEXT NOT NULL,
-  orderItems TEXT NOT NULL,
-  comments TEXT NOT NULL
+  comments TEXT NULL,
+  FOREIGN KEY (custID) REFERENCES user(id)
 
 );
+
+CREATE TABLE orderedItems (
+    iid INTEGER NOT NULL,
+    uid INTEGER NOT NULL,
+    active INTEGER NOT NULL,
+    completed INTEGER,
+    timePlaced INTEGER,
+	nameofitem TEXT,
+	username TEXT,
+	mark DOUBLE,
+    FOREIGN KEY (uid) REFERENCES user(id),
+    FOREIGN KEY (iid) REFERENCES items(iid)
+	
+);
+
+
 
 CREATE TABLE refills(
 	iid INTEGER PRIMARY KEY AUTOINCREMENT,

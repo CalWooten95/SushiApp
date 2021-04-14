@@ -3,24 +3,28 @@
 {% block header %}
   <h1>{% block title %}Checkout{% endblock %}</h1>
   {% if g.user %}
-    <a class="action" href="{{ url_for('customer.index') }}">Complete Order</a>
+    <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+    <a class="action" href="{{ url_for('customer.complete') }}">Complete Order</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-{% for item in table %}
+{% for item in order %}
     <article class="Menu">
       <header>
         <div>
           <h1>{{ item['itemName'] }}</h1>
           <div class="about">Price ${{ item['price'] }} </div>
         </div>
+          <button type="button" onclick="window.location.href='{{ url_for( 'customer.remove' , id=item['iid'] ) }}';">Remove Item</button>
       </header>
-      <p class="body">{{ item['description'] }}</p>
-        <a class="Add to order" href="{{ url_for('customer.index', id=item['iid']) }}">Add Item</a>
+      <p class="body">{{ order['itemName'] }}</p>
     </article>
     {% if not loop.last %}
       <hr>
     {% endif %}
 {% endfor  %}
+
+<h1 align="right">Current Total: ${{ order | sum(attribute='price')}} </h1>
 {% endblock %}
+

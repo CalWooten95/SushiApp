@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Complete Order{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+    <a class="action" href="{{ url_for('customer.checkout') }}">Return to Order</a>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+{% for item in order %}
+        <p>{{ item['itemName'] }} ${{ item['price'] }}</p>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+{% endfor  %}
+
+<h1 align="right">Subtotal: ${{ order | sum(attribute='price')}} </h1>
+<h2 align="right">Tax: ${{ tax }} </h2>
+<h1 align="right">Total: ${{ total }} </h1>
+
+<form method="POST">
+  <label for="tip">Tip: $</label>
+  <input type="number" id="tip" name="tip" min="0" step="1" align="right" width="10" value="0.00">
+    <input type="submit" href="">
+</form>
+
+{% endblock %}
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>

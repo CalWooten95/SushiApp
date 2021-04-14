@@ -43,13 +43,24 @@ def create_app(test_config = None):
     #register checkout
     app.add_url_rule('/', endpoint='checkout')
     app.add_url_rule('/', endpoint='addItem')
+    app.add_url_rule('/', endpoint='remove')
+    app.add_url_rule('/', endpoint='complete')
 
-    #register server
+    # register server
     from . import server
     app.register_blueprint(server.bp)
     app.add_url_rule('/', endpoint='server')
-    app.add_url_rule('/', endpoint='deleteorder' )
+    app.add_url_rule('/', endpoint='deleteorder')
     app.add_url_rule('/', endpoint='addorder')
     app.add_url_rule('/', endpoint='requestfulfilled')
     app.add_url_rule('/', endpoint='helpcomplete')
+    app.add_url_rule('/', endpoint='editorder')
+    app.add_url_rule('/', endpoint='removeitem')
+    app.add_url_rule('/', endpoint='removeitems')
+    app.add_url_rule('/', endpoint='additemview')
+    app.add_url_rule('/', endpoint='additemaction')
+    app.add_url_rule('/', endpoint='remove_queue')
+    app.add_url_rule('/', endpoint='updateorder')
+    app.add_url_rule('/', endpoint='add_queue')
     return app
+
