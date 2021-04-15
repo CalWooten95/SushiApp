@@ -16,10 +16,24 @@
       <header>
         <div>
           <h1>{{ item['itemName'] }}</h1>
+          <p>Comments: {{ item['comments'] }}</p>
           <div class="about">Price ${{ item['price'] }} </div>
         </div>
-          <button type="button" onclick="window.location.href='{{ url_for( 'customer.index' , id=item['iid'] ) }}';">Edit Item</button>
-          <button type="button" onclick="window.location.href='{{ url_for( 'customer.remove' , id=item['iid'] ) }}';">Remove Item</button>
+        <form method="post">
+          {% if item['comments'] %}
+        <label for="comments">Edit Comments</label>
+          {% else %}
+          <label for="comments">Add Comments</label>
+          {% endif %}
+        <input type="text" id="comments"  name="comments" min="0"  align="right" size="16" style="width: 300px;float: left;">
+          {% if item['comments'] %}
+          <input type="submit"  value="Edit Comments" size="100">
+          {% else %}
+          <input type="submit"  value="Add Comments" size="100">
+          {% endif %}
+          <input type="hidden" name="rowid" value="{{ item['ROWID'] }}">
+        </form>
+        <button type="button" onclick="window.location.href='{{ url_for( 'customer.remove' , id=item['iid'] ) }}';">Remove Item</button>
       </header>
       <p class="body">{{ order['itemName'] }}</p>
     </article>
@@ -28,6 +42,6 @@
     {% endif %}
 {% endfor  %}
 
-<h1 align="right">Current Total: ${{ order | sum(attribute='price')}} </h1>
+<h1 align="right">Current Total: ${{ "%.2f"|format(total) }} </h1>
 {% endblock %}
 
