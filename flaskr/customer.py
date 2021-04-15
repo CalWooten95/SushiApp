@@ -186,6 +186,7 @@ def finish(tip):
 
 
     #active = 1, completed = 0 for kitchen
+    
     for item in table:
         db.execute(
           'UPDATE orderedItems SET completed = 0 WHERE uid=? AND ROWID=?', (user_id, item['ROWID']))
