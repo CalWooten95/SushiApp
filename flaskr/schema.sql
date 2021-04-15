@@ -34,6 +34,7 @@ CREATE TABLE orderedItems (
     active INTEGER NOT NULL,
     completed INTEGER,
     timePlaced INTEGER,
+    comments TEXT,
     FOREIGN KEY (uid) REFERENCES user(id),
     FOREIGN KEY (iid) REFERENCES items(iid)
 );

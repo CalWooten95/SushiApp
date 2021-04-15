@@ -47,6 +47,11 @@ def create_app(test_config = None):
     app.add_url_rule('/', endpoint='complete')
     app.add_url_rule('/', endpoint='pay')
     app.add_url_rule('/', endpoint='finish')
+    app.add_url_rule('/', endpoint='entree')
+    app.add_url_rule('/', endpoint='drinks')
+    app.add_url_rule('/', endpoint='dessert')
+    app.add_url_rule('/', endpoint='games')
+
 
     # register server
     from . import server
