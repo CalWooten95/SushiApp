@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Orders {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {% for user in users %}
+    <article class="Menu">
+      <header>
+        <div>
+          <h1> Table {{ user['uid'] }} </h1>
+        </div>
+    </header>
+      {% for order in orders[loop.index0] %}
+          <td>
+            <p> {{ order['itemName'] }}</p>
+            {% if order['comments'] != None %}
+              <p>comments: {{ order['comments']}}</p>
+            {% endif %}
+          </td>
+        {% if not loop.last %}
+        {% endif %}
+      {% endfor %}
+    <button type="button" onclick="window.location.href='{{ url_for( 'kitchen.complete' , id=user['uid'])  }}';">Complete</button>
+    </article>
+    {% if not loop.last %}
+    {% endif %}
+    {% endfor %}
+{% endblock %}
