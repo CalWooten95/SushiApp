@@ -17,9 +17,9 @@
     {% endif %}
 {% endfor  %}
 
-<h1 align="right">Subtotal: ${{ order | sum(attribute='price')}} </h1>
-<h2 align="right">Tax: ${{ tax }} </h2>
-<h1 align="right">Total: ${{ total }} </h1>
+<h1 align="right">Subtotal: ${{ "%.2f"|format(subtotal) }} </h1>
+<h2 align="right">Tax: ${{ "%.2f"|format(tax) }} </h2>
+<h1 align="right">Total: ${{ "%.2f"|format(total) }} </h1>
 
 
 <form method="post">
