@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Manage Menu {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<a href=addmenu ><button type="button">Add Item To Menu</button></a>
+<h1>Current Menu:</h1>
+{% for item in items %}
+  <article class="Menu">
+    <header>
+      <div>
+        <img align="right" src={{ item['link'] }} style="width:150px;height:150px;">
+        <h1>{{ item['itemName'] }}</h1>
+        <div class="about">${{ item['price'] }} </div>
+      </div>
+    </header>
+    <p class="body">{{ item['description'] }}</p>
+
+    <button type="button" onclick="window.location.href='{{ url_for( 'manager.update' , iid=item['iid'] ) }}';">Update</button>
+    <form action="{{ url_for('manager.remove', iid=item['iid']) }}" method="post">
+      <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+    </form>
+    {% if not loop.last %}
+  <hr>
+{% endif %}
+{% endfor %}
+{% endblock %}

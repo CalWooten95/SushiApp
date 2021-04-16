@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Add Item To Menu {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method = "post">
+    <label for="itemName">Item Name</label>
+    <input name="itemName" id="itemName">
+
+    <label for="price">Price</label>
+    <input name="price" id="price">
+
+    <label for="body">Description</label>
+    <textarea name="description" id="description">{{ request.form['body'] }}</textarea>
+
+    <label for="type">Type</label>
+    <select name="type" method="GET" action="/">
+      <option value="{{types[0]}}" selected>{{types[0]}}</option>
+      {% for type in types[1:] %}
+        <option value="{{type}}">{{type}}</option>
+      {% endfor %}
+    </select>
+
+    <label for="link">Image Link</label>
+    <input name="link" id="link">
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}
