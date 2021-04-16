@@ -326,7 +326,7 @@ def finish(tip):
     else:
         win = False
 
-    print(win)
+    
 
     return render_template("customer/finish.html", total=total, tip=tip, order=table, hour=hour, min=min, ampm=ampm, win=win)
 
