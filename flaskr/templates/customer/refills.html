@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Request Refill {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h1>Drinks:</h1>
+{% for drink in drinks %}
+  <article class="post">
+    <header>
+      <div>
+        <img align="right" src={{ drink['link'] }} style="width:150px;height:150px;">
+        <h1>{{ drink['itemName'] }}</h1>
+        <div class="about">${{ drink['price'] }} </div>
+      </div>
+    </header>
+    <p class="body">{{ drink['description'] }}</p>
+    <input type="hidden" name="iid" value="{{ drink['iid'] }}">
+    <form action="{{ url_for('customer.do_refill', id=uid, iid=drink['iid'] ) }}" method="post">
+      <input  type="submit" value="Refill">
+    </form>
+    {% if not loop.last %}
+  <hr>
+{% endif %}
+{% endfor %}
+{% endblock %}

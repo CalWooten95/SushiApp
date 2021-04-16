@@ -28,6 +28,7 @@ def luhn(ccn):
 
 @bp.route('/')
 def index():
+    user_id = session.get('user_id')
     db = get_db()
 
     ordered = db.execute(
@@ -38,8 +39,7 @@ def index():
     table = db.execute('SELECT * FROM items').fetchall()
 
 
-    return render_template('customer/index.html', table=table)
-
+    return render_template('customer/index.html', table=table, uid=user_id)
 
 
 @bp.route('/checkout/', methods=('GET','POST'))
@@ -73,6 +73,32 @@ def checkout():
         total += i['price']
 
     return render_template('customer/checkout.html', order=table, hasItems=hasItems, total=total)
+
+#Request help
+@bp.route('/<int:id>/help', methods=('GET', 'POST'))
+def help(id):
+    db = get_db()
+
+    db.execute('INSERT INTO help (id, tablenumber) VALUES (?, ?)', (id, id,)) #tablenum and id wound up being the same thing
+    db.commit()
+
+    return redirect(url_for('customer.index'))
+
+#Request drink refill
+@bp.route('/<int:id>/refill', methods=('GET', 'POST'))
+def refill(id):
+    db = get_db()
+    d = 'drinks'
+    drinks = db.execute('SELECT * FROM items WHERE type=?', (d,)).fetchall()
+
+    return render_template('customer/refills.html', uid=id, drinks=drinks)
+
+@bp.route('/<int:id>/<int:iid>/refill', methods=('GET', 'POST'))
+def do_refill(id, iid):
+    db = get_db()
+    db.execute('INSERT INTO refills (iid, tablenumber, seatnumber, beverage) VALUES (?, ?, 0, ?)', (iid, id, id)) #tablenum and id wound up being the same thing
+    db.commit()
+    return redirect(url_for('customer.index'))
 
 @bp.route('/<int:id>/addItem/', methods=('GET','POST'))
 @login_required

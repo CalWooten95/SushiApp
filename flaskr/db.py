@@ -28,6 +28,11 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+    svr = 'server'
+    svrpasscode = '1234'
+    db.execute('INSERT INTO user (username,password,id,type) VALUES (?, ?, 5, 2)', (svr, svrpasscode,))
+    db.commit()
+
 
 @click.command('init-db')
 @with_appcontext
