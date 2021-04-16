@@ -1,0 +1,63 @@
+<!doctype html>
+{% block header %}
+<h1 size="10" align="center">Menu </h1>
+{% endblock %}
+
+{% block content %}
+
+{% if key == 0 %}
+
+<article>
+	{% for o in items %}
+		<div>
+			<h1>Item: {{ o.itemName }}	<button onclick="window.location.href='/{{ i }}/{{ o.iid }}/add_queue'">Add Item</button></h1>
+			<p>Comments: </p>
+		</div>
+		{% if not loop.last %}
+			<hr>
+		{% endif %}
+	{% endfor %}
+</article>
+
+{% endif %}
+
+
+
+
+
+
+
+{% if key == 1 %}
+
+<div>
+	<div align="left">
+		<article>
+			{% for o1 in items %}
+				<div>
+					<h1>Item: {{ o1.itemName }}	<button onclick="window.location.href='/5/{{ o1.iid }}/1/additemaction'">Add Item</button></h1>
+				</div>
+				{% if not loop.last %}
+					<hr>
+				{% endif %}
+			{% endfor %}
+		</article>
+	</div>
+	<div align="right">
+		<article>
+			{% for i in oitems %}
+				<div>
+					<h1>{{ i.nameofitem }} <button onclick="window.location.href='/5/{{ i.iid }}/{{ i.mark }}/removeitem'">Remove Item</button></h1>
+				</div>
+				{% if not loop.last %}
+					<hr>
+				{% endif %}
+			{% endfor %}
+		</article>
+	</div>
+</div>
+<h1 align="right">Price: ${{ price }}</h1>
+<h1><button onclick="window.location.href='/server'">Submit</button>	<button onclick="window.location.href='/5/deleteorder'">Cancel</button></h1>
+
+{% endif %}
+
+{% endblock %}
