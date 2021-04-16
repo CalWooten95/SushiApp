@@ -23,29 +23,53 @@ def server_main_page():
     items_to_delete.clear()
     orderitems = get_db().execute('SELECT * FROM orderedItems').fetchall()
     users = get_db().execute('SELECT * FROM user').fetchall()
-    refilldb = get_db().execute('SELECT * FROM refills').fetchall()
+    refilldb = get_db().execute('SELECT * FROM refills LEFT JOIN items ON refills.iid == items.iid').fetchall()
     helpdb = get_db().execute('SELECT * FROM help').fetchall()
     get_db().execute('DELETE FROM orders')
     get_db().commit()
     for u in users:
+        db = get_db()
         orderlist = ""
         num = u['id']
-        table = get_db().execute('SELECT * FROM orderedItems WHERE uid = ?', (num,) ).fetchall()
-        for t in table:
-            orderlist = orderlist + t['nameofitem'] + ' '
-        if orderlist != "":
-            get_db().execute('INSERT INTO orders (custID, comments, total) VALUES (?,?,0)', (num,orderlist,))
-            get_db().commit()
-    orderdb = get_db().execute('SELECT * FROM orders').fetchall()
-        
-    return render_template('server/server.html', table2=refilldb, table3=helpdb, table4=orderdb)
+
+        userQuery = db.execute(
+            'SELECT DISTINCT uid FROM orderedItems WHERE active=1'
+        ).fetchall()
+
+        table = get_db().execute('SELECT *, items.itemName FROM orderedItems LEFT JOIN items ON orderedItems.iid== items.iid WHERE uid = ?', (num,) ).fetchall()
+
+        orders = []
+        is_completed = [] # marked 1 if all orders are marked completed
+
+        for i in userQuery:
+            table = db.execute('SELECT orderedItems.iid, comments, completed, items.itemName FROM orderedItems LEFT JOIN items ON orderedItems.iid = items.iid WHERE uid=?', (i['uid'],)).fetchall()
+            tempnum = 0
+            for t in table:
+                if t['completed'] == 1:
+                    tempnum += 1
+
+            if tempnum == len(table):
+                is_completed.append(1)
+            else:
+                is_completed.append(0)
+
+            orders.append(table)
+            print("appended to orders:", table)
+
+        print("what's in orders?\n")
+        for o in orders:
+            print(o)
+            for p in o:
+                print(p)
+
+    return render_template('server/server.html', users=userQuery, table2=refilldb, table3=helpdb, orders=orders, completed=is_completed)
 
 @bp.route('/<int:id>/additemview')
 def additemview(id):
     table = get_db().execute('SELECT * FROM items').fetchall()
     k = 0
     return render_template('server/servermenu.html',i=id,items=table, key=k)
-    
+
 @bp.route('/<int:id>/<int:iid>/add_queue')
 def add_queue(id,iid):
     p = (id,iid)
@@ -55,12 +79,10 @@ def add_queue(id,iid):
 @bp.route('/<int:id>/<int:iid>/<int:key>/additemaction')
 def additemaction(id,iid,key):
     item = get_db().execute('SELECT * FROM items WHERE iid = ?', (iid,)).fetchone()
-    u1 = get_db().execute('SELECT username FROM user WHERE id = ?', (id,)).fetchone()
     i = item['iid']
-    t = item['itemName']
-    u = u1['username']
+    p2 = item['itemName']
     t0 = time.time()
-    get_db().execute('INSERT INTO orderedItems (iid, uid, nameofitem, username, mark, active) VALUES (?, ?, ?, ?, ?, 1)', (i, id, t, u, t0))
+    get_db().execute('INSERT INTO orderedItems (iid, uid, active, completed, timePlaced,itemName, comments) VALUES (?, ?, ?, ?, ?, ?, ?)', (i, id, 1, 0, t0, p2,None))
     get_db().commit()
     if key == 0:
         return edit_order(id)
@@ -72,9 +94,9 @@ def edit_order(id):
     table = get_db().execute('SELECT * FROM orderedItems WHERE uid = ?', (id,)).fetchall()
     usr = get_db().execute('SELECT * FROM user WHERE id = ?', (id,)).fetchone()
     num = usr['id']
-    return render_template('server/editorder.html', u=usr, oitems=table, n=num)
-    
-    
+    return render_template('server/editorder.html', u=usr, id=id, oitems=table, n=num)
+
+
 @bp.route('/<int:id>/<int:iid>/<float:mark>/remove_queue')
 def remove_queue(id,iid,mark):
     p = (id, iid, mark)
@@ -82,11 +104,11 @@ def remove_queue(id,iid,mark):
     table = get_db().execute('SELECT * FROM orderedItems WHERE uid = ?', (id,)).fetchall()
     usr = get_db().execute('SELECT * FROM user WHERE id = ?', (id,)).fetchall()
     return render_template('server/editorder.html', u=usr, oitems=table)
-    
+
 
 @bp.route('/<int:id>/<int:iid>/<float:mark>/removeitem')
 def remove_item(id,iid,mark):
-    get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND mark = ?', (id,iid,mark))
+    get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND timePlaced = ?', (id,iid,mark))
     get_db().commit()
     return add_order(id)
 
@@ -94,18 +116,19 @@ def remove_item(id,iid,mark):
 @bp.route('/removeitems')
 def remove_order_items():
     for p in items_to_delete:
-        get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND mark = ?', (p[0],p[1],p[2]))
+        get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND timePlaced = ?', (p[0],p[1],p[2]))
         get_db().commit()
     for e in items_to_add:
         t1 = time.time()
         p1 = get_db().execute('SELECT * FROM items WHERE iid = ?', (e[1],)).fetchone()
         p2 = p1['itemName']
-        get_db().execute('INSERT INTO orderedItems (uid,iid,mark,nameofitem,active) VALUES (?, ?, ?, ?, 1)', (e[0],e[1], t1, p2))
+        get_db().execute('INSERT INTO orderedItems (uid,iid,timePlaced,itemName,active) VALUES (?, ?, ?, 1)', (e[0],e[1],t1,p2))
         get_db().commit()
     items_to_delete.clear()
     items_to_add.clear()
     return redirect('/server')
-    
+
+#Add a new order.
 @bp.route('/<int:id>/addorder')
 def add_order(id,iid=None):
     itemdb = get_db().execute('SELECT * FROM items').fetchall()
@@ -115,7 +138,7 @@ def add_order(id,iid=None):
         num = i['iid']
         p = get_db().execute('SELECT * FROM items WHERE iid = ?', (num,)).fetchone()
         total_price += p['price']
-        
+
     tax = round(total_price*0.0625, 2)
     total_price += tax
     key1 = 1
@@ -130,7 +153,7 @@ def delete_order(id):
     get_db().commit()
     items_to_add.clear()
     return redirect('/server')
-    
+
 @bp.route('/<int:iid>/requestfulfilled')
 def clear_request(iid):
     get_db().execute('DELETE FROM refills WHERE iid = ?', (iid,))

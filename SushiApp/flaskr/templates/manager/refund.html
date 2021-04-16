@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Refund {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    {% for sale in sales %}
+    <p> Table {{ sale['uid'] }}
+      {% if sale['refunded'] !=0 %}
+          [Refunded]
+      {% else %}
+          <button type="button" onclick="window.location.href='{{ url_for( 'manager.do_refund' , id=sale['uid'])  }}';">Refund</button>
+      {% endif %}
+    </p>
+    {% endfor %}
+{% endblock %}

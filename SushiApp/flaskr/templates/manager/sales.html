@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Daily Sales {% endblock %}</h1>
+<p>
+    {{ date['month'] }}/{{ date['day']}} {{date['hour']}}:{{date['min']}} {{ ampm }}
+  </p>
+{% endblock %}
+
+{% block content %}
+  {% for sale in sales %}
+  <h1>Table {{ sale['uid']}}</h1>
+    <p>
+       Total:{{ "$%.2f"|format(sale['total']) }}      Tip:{{ "$%.2f"|format(sale['tip']) }}
+      </p>
+    {% endfor %}
+    <p>
+      Sales: {{ "$%.2f"|format(ototal) }}
+      Tips: {{ "$%.2f"|format(tips) }}
+      </p>
+    <h2> Total Earned: {{ "$%.2f"|format(total) }} </h2>
+{% endblock %}

@@ -46,7 +46,7 @@
 		<article>
 			{% for i in oitems %}
 				<div>
-					<h1>{{ i.itemName }} <button onclick="window.location.href='/5/{{ i.iid }}/{{ i.timePlaced }}/removeitem'">Remove Item</button></h1>
+					<h1>{{ i.nameofitem }} <button onclick="window.location.href='/5/{{ i.iid }}/{{ i.mark }}/removeitem'">Remove Item</button></h1>
 				</div>
 				{% if not loop.last %}
 					<hr>

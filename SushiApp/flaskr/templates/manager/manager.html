@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} Manager Actions {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <a href=sales ><button type="button">View Daily Sales</button></a>
+    <a href=refund ><button type="button">Refund</button></a>
+    <a href=menu ><button type="button">Manage Menu Items</button></a>
+{% endblock %}

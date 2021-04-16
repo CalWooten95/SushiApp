@@ -4,8 +4,8 @@
   <h1>{% block title %}Menu{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('customer.games') }}">Games</a>
-    <a class="action" href="{{ url_for('customer.help', id=uid) }}">Request Help</a>
-    <a class="action" href="{{ url_for('customer.refill', id=uid) }}">Request Refill</a>
+    <a class="action" href="{{ url_for('customer.index') }}">Request Help</a>
+    <a class="action" href="{{ url_for('customer.checkout') }}">Request Refill</a>
     <a class="action" href="{{ url_for('customer.checkout') }}">View Order</a>
   {% endif %}
 {% endblock %}
@@ -22,7 +22,7 @@
 
 
 {% for item in table %}
-    {% if item['type'] == 'appetizer' %}
+    {% if item['type'] == 'drinks' %}
     <article class="Menu">
       <header>
         <div>
@@ -33,7 +33,8 @@
       </header>
       <p class="body">{{ item['description'] }}</p>
       <button type="button" onclick="window.location.href='{{ url_for( 'customer.addItem' , id=item['iid'] ) }}';">Add Item</button>
-    {% if not loop.last %}
+
+        {% if not loop.last %}
       <hr>
     {% endif %}
 
