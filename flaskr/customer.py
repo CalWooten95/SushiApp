@@ -336,14 +336,15 @@ def finish(tip):
 #---------------------------------------------------------------------------
 #   entree(): Displays entrees
 #---------------------------------------------------------------------------
+
 @bp.route('/entree/')
 def entree():
     db = get_db()
-
+    user_id = session.get('user_id')
     table = db.execute('SELECT * FROM items').fetchall()
 
 
-    return render_template('customer/entree.html', table=table)
+    return render_template('customer/entree.html', table=table, uid=user_id)
 
 #---------------------------------------------------------------------------
 #   drinks(): Displays drinks.
@@ -352,11 +353,11 @@ def entree():
 def drinks():
     db = get_db()
 
-
+    user_id = session.get('user_id')
     table = db.execute('SELECT * FROM items').fetchall()
 
 
-    return render_template('customer/drinks.html', table=table)
+    return render_template('customer/drinks.html', table=table, uid=user_id)
 
 #---------------------------------------------------------------------------
 #   desserts(): Displays desserts
@@ -364,12 +365,13 @@ def drinks():
 @bp.route('/desserts/')
 def desserts():
     db = get_db()
-
+    user_id = session.get('user_id')
 
     table = db.execute('SELECT * FROM items').fetchall()
 
 
-    return render_template('customer/desserts.html', table=table)
+    return render_template('customer/desserts.html', table=table, uid=user_id)
+
 
 @bp.route('/games/')
 def games():
