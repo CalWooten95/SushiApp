@@ -42,6 +42,9 @@ def index():
     return render_template('customer/index.html', table=table, uid=user_id)
 
 
+#---------------------------------------------------------------------------
+#   checkout(): Handles checkout.html
+#---------------------------------------------------------------------------
 @bp.route('/checkout/', methods=('GET','POST'))
 @login_required
 def checkout():
@@ -74,7 +77,9 @@ def checkout():
 
     return render_template('customer/checkout.html', order=table, hasItems=hasItems, total=total)
 
-#Request help
+#---------------------------------------------------------------------------
+#   help(): Request help and notify server view.
+#---------------------------------------------------------------------------
 @bp.route('/<int:id>/help', methods=('GET', 'POST'))
 def help(id):
     db = get_db()
@@ -84,7 +89,9 @@ def help(id):
 
     return redirect(url_for('customer.index'))
 
-#Request drink refill
+#------------------------------------------------------------------------------
+#   refill() and do_refill(): Prompts user to select a drink to have refilled
+#------------------------------------------------------------------------------
 @bp.route('/<int:id>/refill', methods=('GET', 'POST'))
 def refill(id):
     db = get_db()
@@ -99,6 +106,10 @@ def do_refill(id, iid):
     db.execute('INSERT INTO refills (iid, tablenumber, seatnumber, beverage) VALUES (?, ?, 0, ?)', (iid, id, id)) #tablenum and id wound up being the same thing
     db.commit()
     return redirect(url_for('customer.index'))
+
+#---------------------------------------------------------------------------
+#   addItem(): Add an item to the order.
+#---------------------------------------------------------------------------
 
 @bp.route('/<int:id>/addItem/', methods=('GET','POST'))
 @login_required
@@ -146,7 +157,9 @@ def addItem(id):
 
     return render_template('customer/checkout.html', order=table, hasItems=hasItems, total=total)
 
-
+#---------------------------------------------------------------------------
+#   remove(): Remove item from the order.
+#---------------------------------------------------------------------------
 @bp.route('/<int:id>/remove', methods=('GET','POST'))
 @login_required
 def remove(id):
@@ -194,7 +207,9 @@ def remove(id):
 
     return render_template('customer/checkout.html', order=table, hasItems=hasItems, total=total)
 
-
+#---------------------------------------------------------------------------
+#   complete(): Enter tip size and calculate total price.
+#---------------------------------------------------------------------------
 @bp.route('/complete/', methods=['GET','POST'])
 @login_required
 def complete():
@@ -219,6 +234,9 @@ def complete():
 
     return render_template('customer/complete.html', order=table, tax=tax, total=total, subtotal=subtotal)
 
+#---------------------------------------------------------------------------
+#   pay(): Processes card
+#---------------------------------------------------------------------------
 @bp.route('/pay/<float:tip>', methods=['GET','POST'])
 @login_required
 def pay(tip):
@@ -247,6 +265,10 @@ def pay(tip):
 
     return render_template('customer/pay.html', order=table, total=total, tax=tax, tip=tip, subtotal=subtotal)
 
+
+#---------------------------------------------------------------------------
+#   finish(): Dislays order reciept. Stores results of order in sales table.
+#---------------------------------------------------------------------------
 @bp.route('/finish/<int:tip>')
 @login_required
 def finish(tip):
@@ -311,7 +333,9 @@ def finish(tip):
 
 
 
-
+#---------------------------------------------------------------------------
+#   entree(): Displays entrees
+#---------------------------------------------------------------------------
 @bp.route('/entree/')
 def entree():
     db = get_db()
@@ -321,7 +345,9 @@ def entree():
 
     return render_template('customer/entree.html', table=table)
 
-
+#---------------------------------------------------------------------------
+#   drinks(): Displays drinks.
+#---------------------------------------------------------------------------
 @bp.route('/drinks/')
 def drinks():
     db = get_db()
@@ -332,7 +358,9 @@ def drinks():
 
     return render_template('customer/drinks.html', table=table)
 
-
+#---------------------------------------------------------------------------
+#   desserts(): Displays desserts
+#---------------------------------------------------------------------------
 @bp.route('/desserts/')
 def desserts():
     db = get_db()
