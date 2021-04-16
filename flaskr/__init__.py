@@ -66,11 +66,6 @@ def create_app(test_config = None):
     app.add_url_rule('/', endpoint='requestfulfilled')
     app.add_url_rule('/', endpoint='helpcomplete')
 
-    # register manager
-    from . import manager
-    app.register_blueprint(manager.bp)
-    app.add_url_rule('/', endpoint="manager")
-
     # register kitchen
     from . import kitchen
     app.register_blueprint(kitchen.bp)
