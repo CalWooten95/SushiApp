@@ -261,7 +261,6 @@ def finish(tip):
     t =time.time()
 
     #active = 1, completed = 0 for kitchen
-    
     for item in table:
         db.execute(
           'UPDATE orderedItems SET completed = 0, timePlaced=? WHERE uid=? AND ROWID=?', (t, user_id, item['ROWID'],))
