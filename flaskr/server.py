@@ -28,20 +28,41 @@ def server_main_page():
     get_db().execute('DELETE FROM orders')
     get_db().commit()
     for u in users:
+        db = get_db()
         orderlist = ""
         num = u['id']
+
+        userQuery = db.execute(
+            'SELECT DISTINCT uid FROM orderedItems WHERE active=1'
+        ).fetchall()
+
         table = get_db().execute('SELECT *, items.itemName FROM orderedItems LEFT JOIN items ON orderedItems.iid== items.iid WHERE uid = ?', (num,) ).fetchall()
 
-        for t in table:
-            print("\n\n\ntable itemName: ", t['itemName'])#debug
-            orderlist = str(orderlist) + str(t['itemName']) + str(' ')
+        orders = []
+        is_completed = [] # marked 1 if all orders are marked completed
 
-        if orderlist != "":
-            get_db().execute('INSERT INTO orders (custID, comments, total) VALUES (?,?,0)', (num,orderlist,))
-            get_db().commit()
-    orderdb = get_db().execute('SELECT * FROM orders').fetchall()
+        for i in userQuery:
+            table = db.execute('SELECT orderedItems.iid, comments, completed, items.itemName FROM orderedItems LEFT JOIN items ON orderedItems.iid = items.iid WHERE uid=?', (i['uid'],)).fetchall()
+            tempnum = 0
+            for t in table:
+                if t['completed'] == 1:
+                    tempnum += 1
 
-    return render_template('server/server.html', table2=refilldb, table3=helpdb, table4=orderdb, orders=table)
+            if tempnum == len(table):
+                is_completed.append(1)
+            else:
+                is_completed.append(0)
+
+            orders.append(table)
+            print("appended to orders:", table)
+
+        print("what's in orders?\n")
+        for o in orders:
+            print(o)
+            for p in o:
+                print(p)
+
+    return render_template('server/server.html', users=userQuery, table2=refilldb, table3=helpdb, orders=orders, completed=is_completed)
 
 @bp.route('/<int:id>/additemview')
 def additemview(id):
@@ -58,12 +79,9 @@ def add_queue(id,iid):
 @bp.route('/<int:id>/<int:iid>/<int:key>/additemaction')
 def additemaction(id,iid,key):
     item = get_db().execute('SELECT * FROM items WHERE iid = ?', (iid,)).fetchone()
-    u1 = get_db().execute('SELECT username FROM user WHERE id = ?', (id,)).fetchone()
     i = item['iid']
-    t = item['itemName']
-    u = u1['username']
     t0 = time.time()
-    get_db().execute('INSERT INTO orderedItems (iid, uid, nameofitem, username, mark, active) VALUES (?, ?, ?, ?, ?, 1)', (i, id, t, u, t0))
+    get_db().execute('INSERT INTO orderedItems (iid, uid, active, completed, timePlaced, comments) VALUES (?, ?, ?, ?, ?, ?)', (i, id, 1, 0, t0, None))
     get_db().commit()
     if key == 0:
         return edit_order(id)
@@ -75,7 +93,7 @@ def edit_order(id):
     table = get_db().execute('SELECT * FROM orderedItems WHERE uid = ?', (id,)).fetchall()
     usr = get_db().execute('SELECT * FROM user WHERE id = ?', (id,)).fetchone()
     num = usr['id']
-    return render_template('server/editorder.html', u=usr, oitems=table, n=num)
+    return render_template('server/editorder.html', u=usr, id=id, oitems=table, n=num)
 
 
 @bp.route('/<int:id>/<int:iid>/<float:mark>/remove_queue')
