@@ -52,7 +52,11 @@ def create_app(test_config = None):
     app.add_url_rule('/', endpoint='dessert')
     app.add_url_rule('/', endpoint='games')
 
-
+    # register manager
+    from . import manager
+    app.register_blueprint(manager.bp)
+    app.add_url_rule('/', endpoint="manager")
+    
     # register server
     from . import server
     app.register_blueprint(server.bp)
