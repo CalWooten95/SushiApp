@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS orderedItems;
 DROP TABLE IF EXISTS refills;
 DROP TABLE IF EXISTS help;
+DROP TABLE IF EXISTS sales;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,9 +55,11 @@ CREATE TABLE help(
 	tablenumber INTEGER NOT NULL
 );
 
-INSERT INTO items (iid, price, itemName, description, type, link)
-VALUES
-(203, 10.99, 'California Sushi Roll', 'Standard California roll', 'entree', 'https://anyrecipe.net/asian/recipes/images/californiaroll/done_l.jpg' ),
-(204, 10.99, 'Tuna Tower', 'Hawaiian Bigeye tuna tower with sesame wonton crisps is an elegant recipe created to impress. Bold flavors of delicious fish with the crunchy baked spiced crackers will leave you wanting more!', 'entree', 'https://www.goodtaste.tv/wp-content/uploads/2020/10/Neches_River_Wheelhouse_Tuna_Tower.png' ),
-(105, 9.99, 'Miso Soup', 'Normal miso soup', 'Appetizer', 'https://i0.wp.com/www.crowdedkitchen.com/wp-content/uploads/2020/08/vegan-miso-soup.jpg' ),
-(301, 10.99, 'Cheesecake', 'New York style cheesecake', 'desert', 'https://www.thespruceeats.com/thmb/YRKAj_euVwJoZRM9KX9CF8jKk3w=/3105x3105/smart/filters:no_upscale()/juniors-original-new-york-cheesecake-recipe-1135432-hero-01-663eea27a7344bc885a8a7a401190355.jpg')
+CREATE TABLE sales (
+  uid INTEGER NOT NULL,
+  timePlaced INTEGER,
+  total FLOAT NOT NULL,
+	tip FLOAT NOT NULL,
+  refunded INTEGER,
+  FOREIGN KEY (uid) REFERENCES user(id)
+);
