@@ -18,13 +18,22 @@
 		<article class="List of Orders">
 			<div>
 				<table>
-				{% for o in table4 %}
+				{% for user in users %}
 						<tr>
 							<td style="border:blue; border-width:6px; border-style:outset;">
-								<font size="5">Table {{ o.custID }}<button onclick="window.location.href='/{{ o.custID }}/editorder'">Edit Order</button><button onclick="window.location.href='/{{ o.custID }}/deleteorder'">Delete Order</button></font>
-								<p size="3">Order Description: {{ o.comments }}</p>
+								<font size="5">Table {{ user['uid'] }}<button onclick="window.location.href='/{{ user['id'] }}/editorder'">Edit Order</button><button onclick="window.location.href='/{{ user['uid'] }}/deleteorder'">Delete Order</button></font>
+
+								{% for order in orders[loop.index0] %}
+
+					            <p size="3"> {{ order['itemName'] }}</p>
+					           			{% if order['comments'] != None %}
+					              		<p>comments: {{ order['comments']}}</p>
+
+					           		  {% endif %}
+
+					      {% endfor %}
 							<td>
-							{% if orders[loop.index - 1]['completed'] != 1 %}
+							{% if completed[loop.index0] != 1 %}
 							<td style="background-color:orange;border:blue; border-width:6px; border-style:outset;"><h1 size="8">In Progress</h1></td>
 							{% else %}
 							<td style="background-color:green;border:blue; border-width:6px; border-style:outset;"><h1 style="color:white" size="8">Completed</h1></td>

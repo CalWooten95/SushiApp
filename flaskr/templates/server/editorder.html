@@ -1,15 +1,17 @@
+{% extends 'base.html' %}
 <!doctype html>
 {% block header %}
-<h1 size="10" align="center">Order Number: </h1>
+<h1 size="10" align="center">Table {{ id }}</h1>
 {% endblock %}
 
 {% block content %}
-<h1>Ordernumber: {{ u['username'] }}<h1>
+<h1>user: {{ u['username'] }}<h1>
 <button onclick="window.location.href='/{{ n }}/additemview'">Add Item(s)</button>
 <article>
 	{% for o in oitems %}
 		<div>
 			<h1>Item: {{ o.nameofitem }}	<button onclick="window.location.href='/{{ o.uid }}/{{ o.iid }}/{{ o.mark }}/remove_queue'">Delete Item</button></h1>
+
 			<p>Comments: </p>
 		</div>
 		{% if not loop.last %}
