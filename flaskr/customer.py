@@ -191,8 +191,6 @@ def complete():
     tax = round(total * 0.0625, 2)
     total += tax
 
-
-
     return render_template('customer/complete.html', order=table, tax=tax, total=total, subtotal=subtotal)
 
 @bp.route('/pay/<float:tip>', methods=['GET','POST'])
@@ -241,6 +239,9 @@ def finish(tip):
 
     tax = round(total * 0.0625, 2)
     total += tax
+
+    total_withtax = total #save for sales
+
     total += tip
 
     if time.localtime().tm_hour > 12:
@@ -259,6 +260,10 @@ def finish(tip):
         min = time.localtime().tm_min
 
     t =time.time()
+
+    #save tips for manager sales
+    db.execute('INSERT INTO sales (uid, timePlaced, total, tip, refunded) VALUES (?, ?, ?, ?, 0)', (user_id, t, total, tip,))
+    db.commit()
 
     #active = 1, completed = 0 for kitchen
     for item in table:
