@@ -16,7 +16,10 @@ def get_order(id):
     otd = get_db().execute('SELECT * FROM orders WHERE id = ?', (id,)).fetchone()
     return otd
 
-
+#---------------------------------------------
+# server_main_page(): main page for server.
+# Displays orders, refills, and help requests
+#---------------------------------------------
 @bp.route('/server')
 def server_main_page():
     items_to_add.clear()
@@ -44,7 +47,7 @@ def server_main_page():
         for i in userQuery:
             table = db.execute('SELECT orderedItems.iid, comments, completed, items.itemName FROM orderedItems LEFT JOIN items ON orderedItems.iid = items.iid WHERE uid=?', (i['uid'],)).fetchall()
             tempnum = 0
-            for t in table:
+            for t in table: #if all items in table are completed, the order is completed
                 if t['completed'] == 1:
                     tempnum += 1
 
@@ -52,30 +55,32 @@ def server_main_page():
                 is_completed.append(1)
             else:
                 is_completed.append(0)
-
             orders.append(table)
-            print("appended to orders:", table)
-
-        print("what's in orders?\n")
-        for o in orders:
-            print(o)
-            for p in o:
-                print(p)
 
     return render_template('server/server.html', users=userQuery, table2=refilldb, table3=helpdb, orders=orders, completed=is_completed)
 
+#--------------------------------------------------------------
+# additemview():returns information needed for servermenu.html,
+# where the server can add items to the order
+#--------------------------------------------------------------
 @bp.route('/<int:id>/additemview')
 def additemview(id):
     table = get_db().execute('SELECT * FROM items').fetchall()
     k = 0
     return render_template('server/servermenu.html',i=id,items=table, key=k)
 
+#---------------------------------------------------------------------
+# add_queue(): grabs list of items to add and sends it to edit_order()
+#---------------------------------------------------------------------
 @bp.route('/<int:id>/<int:iid>/add_queue')
 def add_queue(id,iid):
     p = (id,iid)
     items_to_add.append(p)
     return edit_order(id)
 
+#-------------------------------------------------------
+# additemaction(): inserts the new order to the table
+#------------------------------------------------------
 @bp.route('/<int:id>/<int:iid>/<int:key>/additemaction')
 def additemaction(id,iid,key):
     item = get_db().execute('SELECT * FROM items WHERE iid = ?', (iid,)).fetchone()
@@ -88,6 +93,9 @@ def additemaction(id,iid,key):
     else:
         return add_order(id,iid)
 
+#----------------------------------------------------
+# edit_order(): fetches table data for editorder.html
+#----------------------------------------------------
 @bp.route('/<int:id>/editorder')
 def edit_order(id):
     table = get_db().execute('SELECT * FROM orderedItems WHERE uid = ?', (id,)).fetchall()
@@ -95,7 +103,10 @@ def edit_order(id):
     num = usr['id']
     return render_template('server/editorder.html', u=usr, id=id, oitems=table, n=num)
 
-
+#---------------------------------------------
+#   remove_queue(): retrieves information for editorder.
+#   grabs list of items to delete.
+#---------------------------------------------
 @bp.route('/<int:id>/<int:iid>/<float:mark>/remove_queue')
 def remove_queue(id,iid,mark):
     p = (id, iid, mark)
@@ -104,14 +115,18 @@ def remove_queue(id,iid,mark):
     usr = get_db().execute('SELECT * FROM user WHERE id = ?', (id,)).fetchall()
     return render_template('server/editorder.html', u=usr, oitems=table)
 
-
-@bp.route('/<int:id>/<int:iid>/<float:mark>/removeitem')
+#---------------------------------------------
+# remove_item(): deletes order item from table
+#---------------------------------------------
+@bp.route('/<int:id>/<int:iid>/<float:completed>/removeitem')
 def remove_item(id,iid,mark):
-    get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND mark = ?', (id,iid,mark))
+    get_db().execute('DELETE FROM orderedItems WHERE uid = ? AND iid = ? AND completed = ?', (id,iid,mark))
     get_db().commit()
     return add_order(id)
 
-
+#---------------------------------------------
+# remove_order_items(): deletes order items from table
+#---------------------------------------------
 @bp.route('/removeitems')
 def remove_order_items():
     for p in items_to_delete:
@@ -127,7 +142,9 @@ def remove_order_items():
     items_to_add.clear()
     return redirect('/server')
 
-#Add a new order.
+#---------------------------------------------
+# add_order(): Add new order
+#---------------------------------------------
 @bp.route('/<int:id>/addorder')
 def add_order(id,iid=None):
     itemdb = get_db().execute('SELECT * FROM items').fetchall()
@@ -143,7 +160,9 @@ def add_order(id,iid=None):
     key1 = 1
     return render_template('server/servermenu.html', items=itemdb, key=key1, price=total_price, oitems=table)
 
-
+#---------------------------------------------
+# delete_order(): deletes order items from both orderedItems and orders
+#---------------------------------------------
 @bp.route('/<int:id>/deleteorder')
 def delete_order(id):
     get_db().execute('DELETE FROM orderedItems WHERE uid = ?', (id,))
@@ -153,13 +172,18 @@ def delete_order(id):
     items_to_add.clear()
     return redirect('/server')
 
+#---------------------------------------------
+# clear_request(): clears refill requests from page
+#---------------------------------------------
 @bp.route('/<int:iid>/requestfulfilled')
 def clear_request(iid):
     get_db().execute('DELETE FROM refills WHERE iid = ?', (iid,))
     get_db().commit()
     return redirect('/server')
 
-
+#---------------------------------------------
+# remove_order_items(): clears help requests from page
+#---------------------------------------------
 @bp.route('/<int:id>/helpcomplete')
 def help_complete(id):
     get_db().execute('DELETE FROM help WHERE id = ?', (id,))
