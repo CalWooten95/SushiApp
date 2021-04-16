@@ -2,7 +2,12 @@
 
 {% block header %}
 <h1>{% block title %} Request Refill {% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('customer.index') }}">Return To Menu</a>
+    <a class="action" href="{{ url_for('customer.checkout') }}">View Order</a>
+  {% endif %}
 {% endblock %}
+
 
 {% block content %}
 <h1>Drinks:</h1>
